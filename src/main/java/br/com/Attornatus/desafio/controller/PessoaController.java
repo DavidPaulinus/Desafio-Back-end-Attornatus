@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.Attornatus.desafio.DTO.EnderecoDTO;
+import br.com.Attornatus.desafio.DTO.EnderecoListarDTO;
 import br.com.Attornatus.desafio.DTO.PessoaDTO;
 import br.com.Attornatus.desafio.DTO.PessoaDetalhamentoDTO;
 import br.com.Attornatus.desafio.DTO.PessoaListarDTO;
@@ -23,6 +24,7 @@ import br.com.Attornatus.desafio.model.Endereco;
 import br.com.Attornatus.desafio.model.Pessoa;
 import br.com.Attornatus.desafio.util.repository.PessoaRepository;
 import jakarta.transaction.Transactional;
+import jakarta.websocket.server.PathParam;
 
 @RestController
 @RequestMapping("/pessoa")
@@ -59,7 +61,7 @@ public class PessoaController {
 		return ResponseEntity.ok(new PessoaDetalhamentoDTO(pRep.getReferenceById(id)));
 	}
 
-	@PostMapping("/{id}")
+	@PostMapping("endereco/{id}")
 	@Transactional
 	public ResponseEntity criarEnderecoPessoa(@PathVariable Long id, @RequestBody EnderecoDTO dto,
 			UriComponentsBuilder uri) throws ParseException {
@@ -72,6 +74,13 @@ public class PessoaController {
 
 		return ResponseEntity.created(uri.path("/pessoas/{id}").buildAndExpand(id).toUri())
 				.body(new PessoaDetalhamentoDTO(pessoa));
+	}
+
+	@GetMapping("/endereco/{id}")
+	public ResponseEntity<Page<EnderecoListarDTO>> listarEnderecosPessoa(@PageableDefault(sort = { "nome" }) Pageable page, @PathVariable Long id) {
+		System.out.println("***Listando***");
+
+		return ResponseEntity.ok(pRep.findEnderecosPessoa(page, id).map(EnderecoListarDTO::new));
 	}
 
 }
