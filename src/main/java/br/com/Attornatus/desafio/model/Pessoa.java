@@ -15,8 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,14 +28,9 @@ public class Pessoa {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@NotBlank
 	private String nome;
-
-	@NotNull
 	private Date dataNascimento;
 
-	@NotNull
 	@Valid
 	@OneToMany(cascade = CascadeType.PERSIST)
 	private List<Endereco> endereco = new ArrayList<>();;
@@ -45,12 +38,37 @@ public class Pessoa {
 	public Pessoa(PessoaDTO dto) throws ParseException {
 		this.nome = dto.nome();
 		this.dataNascimento = Conversor.toDate(dto.dataNascimento());
-		endereco.add(dto.endereco());
+		this.endereco.add(dto.endereco());
 	}
 
 	public void adicionarEndereco(Endereco end) throws ParseException {
-		endereco.add(end);
+		this.endereco.add(end);
 	}
 
-	
+	public void atualizar(PessoaDTO dto) throws ParseException {
+		this.nome = dto.nome();
+		this.dataNascimento = Conversor.toDate(dto.dataNascimento());
+		
+		for (Endereco end : endereco) {
+			if (end.getId() == dto.endereco().getId()) {
+				end.setCep(dto.endereco().getCep());
+				end.setCidade(dto.endereco().getCidade());
+				end.setLogradouro(dto.endereco().getLogradouro());
+				end.setNumero(dto.endereco().getNumero());
+				end.setPrincipal(dto.endereco().getPrincipal());
+			}
+		}
+
+	}
+
+	public Endereco getPrincipal() {
+		for (Endereco end : endereco) {
+			if (end.getPrincipal() == true) {
+				return end;
+
+			}
+		}
+		return null;
+	}
+
 }

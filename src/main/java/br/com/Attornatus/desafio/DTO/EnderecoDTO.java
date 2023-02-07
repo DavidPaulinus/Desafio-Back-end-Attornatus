@@ -1,6 +1,7 @@
 package br.com.Attornatus.desafio.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record EnderecoDTO(
 		@NotBlank String logradouro, 
@@ -9,6 +10,8 @@ public record EnderecoDTO(
 		
 		@NotBlank String numero,
 		
-		@NotBlank String cidade) {
+		@NotBlank String cidade,
+		
+		@NotNull Boolean principal) {
 
 }

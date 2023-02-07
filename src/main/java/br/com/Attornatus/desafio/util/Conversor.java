@@ -10,4 +10,5 @@ public class Conversor {
 	public static Date toDate(String data) throws ParseException {
 		return sdf.parse(data);
 	}
+
 }
