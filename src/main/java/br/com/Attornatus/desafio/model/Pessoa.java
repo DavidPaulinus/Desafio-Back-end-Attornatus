@@ -47,4 +47,10 @@ public class Pessoa {
 		this.dataNascimento = Conversor.toDate(dto.dataNascimento());
 		endereco.add(dto.endereco());
 	}
+
+	public void adicionarEndereco(Endereco end) throws ParseException {
+		endereco.add(end);
+	}
+
+	
 }
