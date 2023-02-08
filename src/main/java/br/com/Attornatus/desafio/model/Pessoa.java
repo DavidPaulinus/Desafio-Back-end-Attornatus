@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.Attornatus.desafio.DTO.PessoaDTO;
+import br.com.Attornatus.desafio.service.Acao;
 import br.com.Attornatus.desafio.util.Conversor;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -40,35 +41,11 @@ public class Pessoa {
 		this.dataNascimento = Conversor.toDate(dto.dataNascimento());
 		this.endereco.add(dto.endereco());
 	}
-
-	public void adicionarEndereco(Endereco end) throws ParseException {
-		this.endereco.add(end);
-	}
-
+	
 	public void atualizar(PessoaDTO dto) throws ParseException {
 		this.nome = dto.nome();
 		this.dataNascimento = Conversor.toDate(dto.dataNascimento());
-		
-		for (Endereco end : endereco) {
-			if (end.getId() == dto.endereco().getId()) {
-				end.setCep(dto.endereco().getCep());
-				end.setCidade(dto.endereco().getCidade());
-				end.setLogradouro(dto.endereco().getLogradouro());
-				end.setNumero(dto.endereco().getNumero());
-				end.setPrincipal(dto.endereco().getPrincipal());
-			}
-		}
-
-	}
-
-	public Endereco getPrincipal() {
-		for (Endereco end : endereco) {
-			if (end.getPrincipal() == true) {
-				return end;
-
-			}
-		}
-		return null;
+		new Acao().atualizarEndereco(endereco, dto);
 	}
 
 }

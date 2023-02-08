@@ -24,6 +24,7 @@ import br.com.Attornatus.desafio.DTO.PessoaDetalhamentoDTO;
 import br.com.Attornatus.desafio.DTO.PessoaListarDTO;
 import br.com.Attornatus.desafio.model.Endereco;
 import br.com.Attornatus.desafio.model.Pessoa;
+import br.com.Attornatus.desafio.service.Acao;
 import br.com.Attornatus.desafio.util.repository.PessoaRepository;
 import jakarta.transaction.Transactional;
 
@@ -36,7 +37,7 @@ public class PessoaController {
 
 	@PostMapping
 	@Transactional
-	public ResponseEntity criarPessoa(@RequestBody PessoaDTO dto, UriComponentsBuilder uri) throws ParseException {
+	public ResponseEntity<PessoaDetalhamentoDTO> criarPessoa(@RequestBody PessoaDTO dto, UriComponentsBuilder uri) throws ParseException {
 		System.out.println("\\Salvando");
 
 		var pessoa = new Pessoa(dto);
@@ -44,8 +45,7 @@ public class PessoaController {
 
 		System.out.println("/Salvado");
 
-		return ResponseEntity.created(uri.path("/pessoa/{id}").buildAndExpand(pessoa.getId()).toUri())
-				.body(new PessoaDetalhamentoDTO(pessoa));
+		return ResponseEntity.created(uri.path("/pessoa/{id}").buildAndExpand(pessoa.getId()).toUri()).body(new PessoaDetalhamentoDTO(pessoa));
 	}
 
 	@GetMapping
@@ -64,37 +64,34 @@ public class PessoaController {
 
 	@PutMapping("/{id}")
 	@Transactional
-	public ResponseEntity<PessoaDetalhamentoDTO> editarPessoa(@RequestBody PessoaDTO dto, @PathVariable Long id) throws ParseException {
+	public ResponseEntity<PessoaDetalhamentoDTO> editarPessoa(@RequestBody PessoaDTO dto, @PathVariable Long id)throws ParseException {
 		System.out.println("\\Editando Pessoa");
-		
+
 		var pessoa = pRep.getReferenceById(id);
 		pessoa.atualizar(dto);
-		
+
 		System.out.println("/Editado Pessoa");
-		
+
 		return ResponseEntity.ok(new PessoaDetalhamentoDTO(pessoa));
 	}
-	
-	//Endereço
+
+	// Endereço
 
 	@PostMapping("endereco/{id}")
 	@Transactional
-	public ResponseEntity criarEnderecoPessoa(@PathVariable Long id, @RequestBody EnderecoDTO dto,
-			UriComponentsBuilder uri) throws ParseException {
+	public ResponseEntity<PessoaDetalhamentoDTO> criarEnderecoPessoa(@PathVariable Long id, @RequestBody EnderecoDTO dto,UriComponentsBuilder uri) throws ParseException {
 		System.out.println("\\Criando Endereço");
 
 		var pessoa = pRep.getReferenceById(id);
-		pessoa.adicionarEndereco(new Endereco(dto));
+		new Acao().adicionarEndereco(pessoa.getEndereco(), new Endereco(dto));
 
 		System.out.println("/Criado Endereço");
 
-		return ResponseEntity.created(uri.path("/pessoas/{id}").buildAndExpand(id).toUri())
-				.body(new PessoaDetalhamentoDTO(pessoa));
+		return ResponseEntity.created(uri.path("/pessoas/{id}").buildAndExpand(id).toUri()).body(new PessoaDetalhamentoDTO(pessoa));
 	}
 
 	@GetMapping("/endereco/{id}")
-	public ResponseEntity<Page<EnderecoListarDTO>> listarEnderecosPessoa(
-			@PageableDefault(sort = { "nome" }) Pageable page, @PathVariable Long id) {
+	public ResponseEntity<Page<EnderecoListarDTO>> listarEnderecosPessoa(@PageableDefault(sort = { "nome" }) Pageable page, @PathVariable Long id) {
 		System.out.println("***Listando***");
 
 		return ResponseEntity.ok(pRep.findEnderecosPessoa(page, id).map(EnderecoListarDTO::new));
@@ -102,9 +99,9 @@ public class PessoaController {
 
 	@GetMapping("/endereco/principal/{id}")
 	public ResponseEntity<EnderecoDetalhamentoDTO> consultarEnderecoPrincipal(@PathVariable Long id) {
-		System.out.println("***Detalhando***");
+		System.out.println("***Detalhando Principal***");
 
-		return ResponseEntity.ok(new EnderecoDetalhamentoDTO(pRep.getReferenceById(id).getPrincipal()));
+		return ResponseEntity.ok(new EnderecoDetalhamentoDTO(new Acao().getPrincipal(pRep.getReferenceById(id).getEndereco())));
 	}
 
 }

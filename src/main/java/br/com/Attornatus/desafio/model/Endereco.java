@@ -1,7 +1,6 @@
 package br.com.Attornatus.desafio.model;
 
 import br.com.Attornatus.desafio.DTO.EnderecoDTO;
-import br.com.Attornatus.desafio.util.Conversor;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
