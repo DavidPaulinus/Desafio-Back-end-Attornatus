@@ -1,13 +1,12 @@
 package br.com.Attornatus.desafio.model;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import br.com.Attornatus.desafio.DTO.PessoaDTO;
+import br.com.Attornatus.desafio.DTO.pessoa.PessoaDTO;
 import br.com.Attornatus.desafio.service.Acao;
-import br.com.Attornatus.desafio.util.Conversor;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,7 +29,7 @@ public class Pessoa {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String nome;
-	private Date dataNascimento;
+	private LocalDate dataNascimento;
 
 	@Valid
 	@OneToMany(cascade = CascadeType.PERSIST)
@@ -38,13 +37,13 @@ public class Pessoa {
 
 	public Pessoa(PessoaDTO dto) throws ParseException {
 		this.nome = dto.nome();
-		this.dataNascimento = Conversor.toDate(dto.dataNascimento());
+		this.dataNascimento = dto.dataNascimento();
 		this.endereco.add(dto.endereco());
 	}
-	
+
 	public void atualizar(PessoaDTO dto) throws ParseException {
 		this.nome = dto.nome();
-		this.dataNascimento = Conversor.toDate(dto.dataNascimento());
+		this.dataNascimento = dto.dataNascimento();
 		new Acao().atualizarEndereco(endereco, dto);
 	}
 

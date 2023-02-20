@@ -1,6 +1,6 @@
 package br.com.Attornatus.desafio.model;
 
-import br.com.Attornatus.desafio.DTO.EnderecoDTO;
+import br.com.Attornatus.desafio.DTO.endereco.EnderecoDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,4 +35,15 @@ public class Endereco {
 		this.principal = dto.principal();
 		
 	}
+
+	public Endereco(String logradouro, String cep, String numero, String cidade, Boolean principal) {
+		super();
+		this.logradouro = logradouro;
+		this.cep = cep;
+		this.numero = numero;
+		this.cidade = cidade;
+		this.principal = principal;
+	}
+	
+	
 }

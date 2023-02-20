@@ -3,12 +3,13 @@ package br.com.Attornatus.desafio.service;
 import java.text.ParseException;
 import java.util.List;
 
-import br.com.Attornatus.desafio.DTO.PessoaDTO;
+import br.com.Attornatus.desafio.DTO.pessoa.PessoaDTO;
 import br.com.Attornatus.desafio.model.Endereco;
+import jakarta.servlet.ServletException;
 import jakarta.validation.Valid;
 
 public class Acao {
-	public void adicionarEndereco(List<Endereco> endereco, Endereco end) throws ParseException {
+	public void adicionarEndereco(List<Endereco> endereco, Endereco end) throws ParseException, ServletException {
 		endereco.add(naoFavoritoEndereco(endereco, end));
 	}
 
@@ -26,19 +27,19 @@ public class Acao {
 
 	}
 
-	public Endereco getPrincipal(List<Endereco> endereco) {
+	public Endereco getPrincipal(List<Endereco> endereco) throws ServletException {
 		for (Endereco end : endereco) {
 			if (end.getPrincipal() == true) {
 				return end;
 			}
 		}
-		return null;
+		throw new ServletException("Não há nenhum endereço principal");
 	}
 	
-	public Endereco naoFavoritoEndereco(@Valid List<Endereco> endereco, Endereco end) {
+	private Endereco naoFavoritoEndereco(@Valid List<Endereco> endereco, Endereco end) throws ServletException {
 		for (Endereco list : endereco) {
 			if (list.getPrincipal() == true && end.getPrincipal() == true) {
-				return null;
+				 throw new ServletException("Não é possível ter mais de um enderço sendo favorito");
 			}
 		}
 		return end;

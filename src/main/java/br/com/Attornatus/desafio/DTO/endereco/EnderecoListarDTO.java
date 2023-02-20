@@ -1,4 +1,4 @@
-package br.com.Attornatus.desafio.DTO;
+package br.com.Attornatus.desafio.DTO.endereco;
 
 import br.com.Attornatus.desafio.model.Endereco;
 

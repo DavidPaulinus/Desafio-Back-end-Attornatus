@@ -1,4 +1,8 @@
-package br.com.Attornatus.desafio.DTO;
+package br.com.Attornatus.desafio.DTO.pessoa;
+
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import br.com.Attornatus.desafio.model.Endereco;
 import jakarta.validation.Valid;
@@ -10,7 +14,8 @@ public record PessoaDTO(
 		String nome, 
 		
 		@NotNull
-		String dataNascimento, 
+		@JsonFormat(pattern = "dd/MM/yyyy")
+		LocalDate dataNascimento, 
 		
 		@NotNull
 		@Valid

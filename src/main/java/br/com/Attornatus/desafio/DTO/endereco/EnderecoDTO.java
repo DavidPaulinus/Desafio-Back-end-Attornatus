@@ -1,4 +1,4 @@
-package br.com.Attornatus.desafio.DTO;
+package br.com.Attornatus.desafio.DTO.endereco;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

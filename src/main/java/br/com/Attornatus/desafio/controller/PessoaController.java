@@ -16,16 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.Attornatus.desafio.DTO.EnderecoDTO;
-import br.com.Attornatus.desafio.DTO.EnderecoDetalhamentoDTO;
-import br.com.Attornatus.desafio.DTO.EnderecoListarDTO;
-import br.com.Attornatus.desafio.DTO.PessoaDTO;
-import br.com.Attornatus.desafio.DTO.PessoaDetalhamentoDTO;
-import br.com.Attornatus.desafio.DTO.PessoaListarDTO;
-import br.com.Attornatus.desafio.model.Endereco;
+import br.com.Attornatus.desafio.DTO.endereco.EnderecoDTO;
+import br.com.Attornatus.desafio.DTO.endereco.EnderecoDetalhamentoDTO;
+import br.com.Attornatus.desafio.DTO.endereco.EnderecoListarDTO;
+import br.com.Attornatus.desafio.DTO.pessoa.PessoaDTO;
+import br.com.Attornatus.desafio.DTO.pessoa.PessoaDetalhamentoDTO;
+import br.com.Attornatus.desafio.DTO.pessoa.PessoaListarDTO;
 import br.com.Attornatus.desafio.model.Pessoa;
-import br.com.Attornatus.desafio.service.Acao;
-import br.com.Attornatus.desafio.util.repository.PessoaRepository;
+import br.com.Attornatus.desafio.service.PessoaService;
+import jakarta.servlet.ServletException;
 import jakarta.transaction.Transactional;
 
 @RestController
@@ -33,44 +32,31 @@ import jakarta.transaction.Transactional;
 public class PessoaController {
 
 	@Autowired
-	private PessoaRepository pRep;
+	private PessoaService serv;
 
 	@PostMapping
 	@Transactional
 	public ResponseEntity<PessoaDetalhamentoDTO> criarPessoa(@RequestBody PessoaDTO dto, UriComponentsBuilder uri) throws ParseException {
-		System.out.println("\\Salvando");
-
 		var pessoa = new Pessoa(dto);
-		pRep.save(pessoa);
-
-		System.out.println("/Salvado");
+		serv.salvarPessoa(pessoa);
 
 		return ResponseEntity.created(uri.path("/pessoa/{id}").buildAndExpand(pessoa.getId()).toUri()).body(new PessoaDetalhamentoDTO(pessoa));
 	}
 
 	@GetMapping
 	public ResponseEntity<Page<PessoaListarDTO>> listarPessoas(@PageableDefault(sort = { "nome" }) Pageable page) {
-		System.out.println("***Listando***");
-
-		return ResponseEntity.ok(pRep.findAll(page).map(PessoaListarDTO::new));
+		return ResponseEntity.ok(serv.listarPessoa(page).map(PessoaListarDTO::new));
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<PessoaDetalhamentoDTO> consultarPessoa(@PathVariable Long id) {
-		System.out.println("***Detalhando***");
-
-		return ResponseEntity.ok(new PessoaDetalhamentoDTO(pRep.getReferenceById(id)));
+		return ResponseEntity.ok(new PessoaDetalhamentoDTO(serv.detalharPessoaPorId(id)));
 	}
 
 	@PutMapping("/{id}")
 	@Transactional
 	public ResponseEntity<PessoaDetalhamentoDTO> editarPessoa(@RequestBody PessoaDTO dto, @PathVariable Long id)throws ParseException {
-		System.out.println("\\Editando Pessoa");
-
-		var pessoa = pRep.getReferenceById(id);
-		pessoa.atualizar(dto);
-
-		System.out.println("/Editado Pessoa");
+		var pessoa = serv.atualizarPessoa(id, dto);
 
 		return ResponseEntity.ok(new PessoaDetalhamentoDTO(pessoa));
 	}
@@ -79,29 +65,20 @@ public class PessoaController {
 
 	@PostMapping("endereco/{id}")
 	@Transactional
-	public ResponseEntity<PessoaDetalhamentoDTO> criarEnderecoPessoa(@PathVariable Long id, @RequestBody EnderecoDTO dto,UriComponentsBuilder uri) throws ParseException {
-		System.out.println("\\Criando Endereço");
-
-		var pessoa = pRep.getReferenceById(id);
-		new Acao().adicionarEndereco(pessoa.getEndereco(), new Endereco(dto));
-
-		System.out.println("/Criado Endereço");
+	public ResponseEntity<PessoaDetalhamentoDTO> criarEnderecoPessoa(@PathVariable Long id, @RequestBody EnderecoDTO dto,UriComponentsBuilder uri) throws ParseException, ServletException {
+		var pessoa = serv.adicionarEndereco(id, dto);
 
 		return ResponseEntity.created(uri.path("/pessoas/{id}").buildAndExpand(id).toUri()).body(new PessoaDetalhamentoDTO(pessoa));
 	}
 
 	@GetMapping("/endereco/{id}")
 	public ResponseEntity<Page<EnderecoListarDTO>> listarEnderecosPessoa(@PageableDefault(sort = { "nome" }) Pageable page, @PathVariable Long id) {
-		System.out.println("***Listando***");
-
-		return ResponseEntity.ok(pRep.findEnderecosPessoa(page, id).map(EnderecoListarDTO::new));
+		return ResponseEntity.ok(serv.listarEnderecos(page, id).map(EnderecoListarDTO::new));
 	}
 
 	@GetMapping("/endereco/principal/{id}")
-	public ResponseEntity<EnderecoDetalhamentoDTO> consultarEnderecoPrincipal(@PathVariable Long id) {
-		System.out.println("***Detalhando Principal***");
-
-		return ResponseEntity.ok(new EnderecoDetalhamentoDTO(new Acao().getPrincipal(pRep.getReferenceById(id).getEndereco())));
+	public ResponseEntity<EnderecoDetalhamentoDTO> consultarEnderecoPrincipal(@PathVariable Long id) throws ServletException {
+		return ResponseEntity.ok(new EnderecoDetalhamentoDTO(serv.enderecoPrincipal(id)));
 	}
 
 }
